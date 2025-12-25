@@ -1,0 +1,207 @@
+<UserControl x:Class="SecureFileExchange.Views.AuthenticationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:SecureFileExchange.ViewModels">
+    
+    <UserControl.DataContext>
+        <vm:AuthenticationViewModel/>
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#238636"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="20,12"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#2ea043"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SecondaryButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#58a6ff"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#30363d"/>
+            <Setter Property="Padding" Value="20,12"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1f6feb"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="BorderBrush" Value="#1f6feb"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <StackPanel HorizontalAlignment="Center" 
+                   VerticalAlignment="Center"
+                   Width="420">
+            
+            <!-- Logo -->
+            <Border Background="#1f6feb"
+                    Width="80"
+                    Height="80"
+                    CornerRadius="16"
+                    HorizontalAlignment="Center"
+                    Margin="0,0,0,30">
+                <TextBlock Text="👤" 
+                          FontSize="48"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"/>
+            </Border>
+
+            <!-- Title -->
+            <TextBlock HorizontalAlignment="Center"
+                      Margin="0,0,0,10"
+                      FontSize="24"
+                      FontWeight="Bold"
+                      Foreground="#c9d1d9"
+                      Text="{Binding IsLoginMode, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Welcome Back|Create New Account'}"/>
+
+            <TextBlock Text="Multi-user authentication system"
+                      HorizontalAlignment="Center"
+                      Foreground="#7d8590"
+                      FontSize="13"
+                      Margin="0,0,0,30"/>
+
+            <!-- Username Field -->
+            <TextBlock Text="Username" 
+                      Foreground="#7d8590"
+                      FontSize="13"
+                      FontWeight="Medium"
+                      Margin="0,0,0,8"/>
+            <TextBox Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"
+                    Background="#0d1117"
+                    Foreground="#c9d1d9"
+                    BorderBrush="#30363d"
+                    BorderThickness="1"
+                    Padding="12"
+                    FontSize="14"
+                    Height="44"
+                    Margin="0,0,0,15"/>
+
+            <!-- Password Field -->
+            <TextBlock Text="Password" 
+                      Foreground="#7d8590"
+                      FontSize="13"
+                      FontWeight="Medium"
+                      Margin="0,0,0,8"/>
+            <PasswordBox x:Name="PasswordBox"
+                        Background="#0d1117"
+                        Foreground="#c9d1d9"
+                        BorderBrush="#30363d"
+                        BorderThickness="1"
+                        Padding="12"
+                        FontSize="14"
+                        Height="44"
+                        Margin="0,0,0,8"
+                        PasswordChar="●"/>
+
+            <!-- Status Message -->
+            <TextBlock Text="{Binding StatusMessage}"
+                      Foreground="#f85149"
+                      FontSize="12"
+                      TextAlignment="Center"
+                      Margin="0,0,0,20"
+                      TextWrapping="Wrap"
+                      MinHeight="20"/>
+
+            <!-- Login Button -->
+            <Button Content="SIGN IN"
+                   Style="{StaticResource ModernButton}"
+                   Command="{Binding LoginCommand}"
+                   Click="LoginButton_Click"
+                   Height="42"
+                   Margin="0,0,0,10"
+                   Visibility="{Binding IsLoginMode, Converter={StaticResource BoolToVis}}"/>
+
+            <!-- Register Button -->
+            <Button Content="CREATE ACCOUNT"
+                   Style="{StaticResource ModernButton}"
+                   Command="{Binding RegisterCommand}"
+                   Click="RegisterButton_Click"
+                   Height="42"
+                   Margin="0,0,0,10"
+                   Visibility="{Binding IsLoginMode, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Inverse}"/>
+
+            <!-- Switch Mode Button -->
+            <Button Command="{Binding SwitchModeCommand}"
+                   Style="{StaticResource SecondaryButton}"
+                   Height="42">
+                <Button.Content>
+                    <TextBlock>
+                        <Run Text="{Binding IsLoginMode, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Need an account? Register|Already have an account? Login'}"/>
+                    </TextBlock>
+                </Button.Content>
+            </Button>
+
+            <!-- Info Box -->
+            <Border Background="#0d1117"
+                    CornerRadius="6"
+                    Padding="15"
+                    Margin="0,30,0,0"
+                    BorderBrush="#30363d"
+                    BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="ℹ️ Multi-User System"
+                              Foreground="#58a6ff"
+                              FontSize="12"
+                              FontWeight="Bold"
+                              Margin="0,0,0,8"/>
+                    <TextBlock TextWrapping="Wrap"
+                              Foreground="#7d8590"
+                              FontSize="11"
+                              LineHeight="16">
+                        <Run Text="• Each user has a unique cryptographic identity"/>
+                        <LineBreak/>
+                        <Run Text="• RSA keys are generated once and never regenerated"/>
+                        <LineBreak/>
+                        <Run Text="• Password only protects your private keys"/>
+                        <LineBreak/>
+                        <Run Text="• Share your public keys file with others"/>
+                        <LineBreak/>
+                        <Run Text="• Users are stored in: C:\SecureFileExchange\Users\"/>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1,0 +1,332 @@
+<UserControl x:Class="SecureFileExchange.Views.ConsumerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:SecureFileExchange.ViewModels"
+             xmlns:models="clr-namespace:SecureFileExchange.Models">
+    
+    <UserControl.DataContext>
+        <vm:ConsumerViewModel/>
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#c9d1d9"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0,25,0,12"/>
+        </Style>
+
+        <Style x:Key="Label" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#7d8590"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+        </Style>
+
+        <Style x:Key="BrowseButton" TargetType="Button">
+            <Setter Property="Background" Value="#21262d"/>
+            <Setter Property="Foreground" Value="#c9d1d9"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#30363d"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#30363d"/>
+                    <Setter Property="BorderBrush" Value="#58a6ff"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="InputBox" TargetType="TextBox">
+            <Setter Property="Background" Value="#0d1117"/>
+            <Setter Property="Foreground" Value="#c9d1d9"/>
+            <Setter Property="BorderBrush" Value="#30363d"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                         Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0">
+            
+            <!-- Header -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                <Border Background="#1f6feb"
+                        Width="40"
+                        Height="40"
+                        CornerRadius="8"
+                        Margin="0,0,12,0">
+                    <TextBlock Text="📥" 
+                              FontSize="20"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"/>
+                </Border>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="File Decryption" 
+                              FontSize="20"
+                              FontWeight="Bold"
+                              Foreground="#c9d1d9"/>
+                    <TextBlock Text="Decrypt and verify encrypted files"
+                              FontSize="12"
+                              Foreground="#7d8590"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Encrypted File Selection -->
+            <TextBlock Text="📦 Encrypted File" Style="{StaticResource SectionTitle}"/>
+            <Border Background="#0d1117" 
+                   CornerRadius="6" 
+                   Padding="12"
+                   BorderBrush="#30363d"
+                   BorderThickness="1"
+                   Margin="0,0,0,8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBox Grid.Column="0"
+                            Text="{Binding EncryptedFilePath}"
+                            IsReadOnly="True"
+                            Style="{StaticResource InputBox}"
+                            BorderThickness="0"
+                            Background="Transparent"
+                            VerticalContentAlignment="Center"/>
+                    
+                    <Button Grid.Column="1"
+                           Content="Browse"
+                           Command="{Binding BrowseEncryptedFileCommand}"
+                           Style="{StaticResource BrowseButton}"
+                           Margin="8,0,0,0"/>
+                </Grid>
+            </Border>
+
+            <!-- Producer Public Key -->
+            <TextBlock Text="🔑 Select Producer User (Who encrypted this file)" Style="{StaticResource SectionTitle}"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <ComboBox Grid.Column="0"
+                         ItemsSource="{Binding AvailableUsers}"
+                         SelectedItem="{Binding SelectedProducerUsername}"
+                         Height="44"
+                         FontSize="14"
+                         Foreground="White"
+                         Margin="0,0,8,8">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" Foreground="White"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                
+                <Button Grid.Column="1"
+                       Content="🔄"
+                       Command="{Binding RefreshUsersCommand}"
+                       Style="{StaticResource BrowseButton}"
+                       Width="44"
+                       Margin="0,0,0,8"
+                       ToolTip="Refresh user list"/>
+            </Grid>
+
+            <!-- Key Input for Symmetric (Optional) -->
+            <TextBlock Text="🔐 Symmetric Key (Optional - Only for Symmetric Method)" Style="{StaticResource SectionTitle}"/>
+            
+            <!-- Key Generation Method -->
+            <Border Background="#0d1117"
+                    CornerRadius="6"
+                    Padding="12"
+                    BorderBrush="#30363d"
+                    BorderThickness="1"
+                    Margin="0,0,0,8">
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Content="Password"
+                               IsChecked="{Binding KeyGenMethod, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Password}"
+                               Foreground="#c9d1d9"
+                               Margin="0,0,20,0"
+                               GroupName="KeyGenConsumer"/>
+                    <RadioButton Content="File"
+                               IsChecked="{Binding KeyGenMethod, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=File}"
+                               Foreground="#c9d1d9"
+                               GroupName="KeyGenConsumer"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Password Input -->
+            <Border Visibility="{Binding KeyGenMethod, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Password}">
+                <StackPanel>
+                    <TextBlock Text="Shared Password" 
+                              Style="{StaticResource Label}"/>
+                    <PasswordBox x:Name="SharedPasswordBox"
+                                Background="#0d1117"
+                                Foreground="#c9d1d9"
+                                BorderBrush="#30363d"
+                                BorderThickness="1"
+                                Padding="12"
+                                FontSize="14"
+                                Height="44"
+                                Margin="0,0,0,8"
+                                PasswordChar="●"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Key File Input -->
+            <Border Visibility="{Binding KeyGenMethod, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=File}">
+                <StackPanel>
+                    <TextBlock Text="Key File" 
+                              Style="{StaticResource Label}"/>
+                    <Border Background="#0d1117" 
+                           CornerRadius="6" 
+                           Padding="12"
+                           BorderBrush="#30363d"
+                           BorderThickness="1"
+                           Margin="0,0,0,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBox Grid.Column="0"
+                                    Text="{Binding SharedKeyFilePath}"
+                                    IsReadOnly="True"
+                                    Style="{StaticResource InputBox}"
+                                    BorderThickness="0"
+                                    Background="Transparent"
+                                    VerticalContentAlignment="Center"/>
+                            
+                            <Button Grid.Column="1"
+                                   Content="Browse"
+                                   Command="{Binding BrowseKeyFileCommand}"
+                                   Style="{StaticResource BrowseButton}"
+                                   Margin="8,0,0,0"/>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Info Box -->
+            <Border Background="#0d1117" 
+                   CornerRadius="6" 
+                   Padding="15"
+                   BorderBrush="#30363d"
+                   BorderThickness="1"
+                   Margin="0,8,0,0">
+                <StackPanel>
+                    <TextBlock Text="ℹ️ Information" 
+                              Foreground="#58a6ff"
+                              FontWeight="Bold"
+                              FontSize="13"
+                              Margin="0,0,0,8"/>
+                    <TextBlock TextWrapping="Wrap"
+                              Foreground="#7d8590"
+                              FontSize="12"
+                              LineHeight="18">
+                        <Run Text="• For Secure Envelope and RSA Direct: Only producer's public key is needed"/>
+                        <LineBreak/>
+                        <Run Text="• For Symmetric: Provide the same password or key file used during encryption"/>
+                        <LineBreak/>
+                        <Run Text="• The system will automatically detect the encryption method from the file"/>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+            <!-- Progress Bar -->
+            <Border Visibility="{Binding Progress, Converter={StaticResource ProgressToVisibilityConverter}}"
+                   Margin="0,25,0,0">
+                <StackPanel>
+                    <Grid Margin="0,0,0,6">
+                        <TextBlock Text="{Binding StatusMessage}"
+                                  Foreground="#7d8590"
+                                  FontSize="13"/>
+                        <TextBlock Text="{Binding Progress, StringFormat={}{0}%}"
+                                  Foreground="#58a6ff"
+                                  FontSize="13"
+                                  HorizontalAlignment="Right"/>
+                    </Grid>
+                    <ProgressBar Value="{Binding Progress}"
+                                Maximum="100"
+                                Height="8"
+                                Background="#0d1117"
+                                Foreground="#1f6feb"
+                                BorderBrush="#30363d"
+                                BorderThickness="1"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Decrypt Button -->
+            <Button Content="🔓 DECRYPT &amp; VERIFY FILE"
+                   Command="{Binding DecryptCommand}"
+                   Click="DecryptButton_Click"
+                   Background="#1f6feb"
+                   Foreground="White"
+                   BorderThickness="0"
+                   Padding="0,14"
+                   FontSize="14"
+                   FontWeight="Bold"
+                   Cursor="Hand"
+                   Height="48"
+                   Margin="0,25,0,0">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#1f6feb"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#388bfd"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#21262d"/>
+                                <Setter Property="Foreground" Value="#484f58"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

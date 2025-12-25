@@ -1,0 +1,16 @@
+<Application x:Class="SecureFileExchange.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:SecureFileExchange.Converters"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <!-- Converters -->
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+        <converters:BoolToStringConverter x:Key="BoolToStringConverter"/>
+        <converters:EnumToBoolConverter x:Key="EnumToBoolConverter"/>
+        <converters:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter"/>
+        <converters:MethodToVisibilityConverter x:Key="MethodToVisibilityConverter"/>
+        <converters:ProgressToVisibilityConverter x:Key="ProgressToVisibilityConverter"/>
+    </Application.Resources>
+</Application>
