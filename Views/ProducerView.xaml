@@ -9,6 +9,10 @@
     </UserControl.DataContext>
 
     <UserControl.Resources>
+        <!-- Converters -->
+        <vm:RecipientTypeConverter x:Key="RecipientTypeConverter"/>
+        <vm:RSAEncryptionModeConverter x:Key="RSAEncryptionModeConverter"/>
+        
         <Style x:Key="SectionTitle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="#c9d1d9"/>
             <Setter Property="FontSize" Value="15"/>
@@ -102,6 +106,40 @@
                 </StackPanel>
             </StackPanel>
 
+            <!-- Export Public Keys Button -->
+            <Button Content="📤 Export My Public Keys"
+                   Command="{Binding ExportMyPublicKeysCommand}"
+                   Background="#1f6feb"
+                   Foreground="White"
+                   BorderThickness="0"
+                   Padding="15,10"
+                   FontSize="13"
+                   FontWeight="SemiBold"
+                   Cursor="Hand"
+                   HorizontalAlignment="Right"
+                   Margin="0,0,0,15">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#1f6feb"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#388bfd"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+
             <!-- File Selection -->
             <TextBlock Text="📁 Select File" Style="{StaticResource SectionTitle}"/>
             <Border Background="#0d1117" 
@@ -137,8 +175,7 @@
             <ComboBox SelectedValue="{Binding SelectedMACAlgorithm}"
                      Height="44"
                      Margin="0,0,0,8"
-                     FontSize="14"
-                     Foreground="White">
+                     FontSize="14">
                 <ComboBox.ItemsSource>
                     <x:Array Type="models:MACAlgorithmType">
                         <models:MACAlgorithmType>HMACSHA256</models:MACAlgorithmType>
@@ -175,38 +212,156 @@
                 </StackPanel>
             </Border>
 
-            <!-- Consumer Public Key -->
+            <!-- RSA Direct Mode Selection (NEW) -->
+            <Border Visibility="{Binding SelectedMethod, Converter={StaticResource MethodToVisibilityConverter}, ConverterParameter='RSADirect'}">
+                <StackPanel>
+                    <TextBlock Text="⚙️ RSA Direct Mode" Style="{StaticResource SectionTitle}"/>
+                    <Border Background="#0d1117"
+                            CornerRadius="6"
+                            Padding="12"
+                            BorderBrush="#30363d"
+                            BorderThickness="1"
+                            Margin="0,0,0,8">
+                        <StackPanel>
+                            <RadioButton Content="With Signature &amp; MAC (Standard - Includes authentication)"
+                                       IsChecked="{Binding RSAEncryptionMode, Converter={StaticResource RSAEncryptionModeConverter}, ConverterParameter=WithSignature}"
+                                       Foreground="#c9d1d9"
+                                       Margin="0,0,0,8"
+                                       GroupName="RSAMode"/>
+                            <RadioButton Content="No Signature (Educational - Direct RSA only, max 190 bytes)"
+                                       IsChecked="{Binding RSAEncryptionMode, Converter={StaticResource RSAEncryptionModeConverter}, ConverterParameter=NoSignature}"
+                                       Foreground="#f85149"
+                                       Margin="0,0,0,0"
+                                       GroupName="RSAMode"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Warning for No Signature Mode -->
+                    <Border Background="#2d1a1f"
+                            CornerRadius="6"
+                            Padding="12"
+                            BorderBrush="#f85149"
+                            BorderThickness="1"
+                            Margin="0,0,0,8"
+                            Visibility="{Binding RSAEncryptionMode, Converter={StaticResource RSAEncryptionModeConverter}, ConverterParameter=NoSignature}">
+                        <StackPanel>
+                            <TextBlock Text="⚠️ WARNING - Educational Mode Only"
+                                      Foreground="#f85149"
+                                      FontWeight="Bold"
+                                      FontSize="13"
+                                      Margin="0,0,0,8"/>
+                            <TextBlock TextWrapping="Wrap"
+                                      Foreground="#ffa198"
+                                      FontSize="11"
+                                      LineHeight="16">
+                                <Run Text="• This mode does NOT provide authenticity or integrity protection"/>
+                                <LineBreak/>
+                                <Run Text="• No digital signature or MAC is used"/>
+                                <LineBreak/>
+                                <Run Text="• Maximum file size: 190 bytes"/>
+                                <LineBreak/>
+                                <Run Text="• For educational/testing purposes ONLY"/>
+                                <LineBreak/>
+                                <Run Text="• NEVER use for real sensitive data"/>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Recipient Selection -->
             <Border Visibility="{Binding SelectedMethod, Converter={StaticResource MethodToVisibilityConverter}, ConverterParameter='SecureEnvelope,RSADirect'}">
                 <StackPanel>
-                    <TextBlock Text="🔑 Select Consumer User" Style="{StaticResource SectionTitle}"/>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        
-                        <ComboBox Grid.Column="0"
-                                 ItemsSource="{Binding AvailableUsers}"
-                                 SelectedItem="{Binding SelectedConsumerUsername}"
-                                 Height="44"
-                                 FontSize="14"
-                                 Foreground="White"
-                                 Margin="0,0,8,8">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}" Foreground="White"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                        
-                        <Button Grid.Column="1"
-                               Content="🔄"
-                               Command="{Binding RefreshUsersCommand}"
-                               Style="{StaticResource BrowseButton}"
-                               Width="44"
-                               Margin="0,0,0,8"
-                               ToolTip="Refresh user list"/>
-                    </Grid>
+                    <TextBlock Text="👥 Recipient Type" Style="{StaticResource SectionTitle}"/>
+                    <Border Background="#0d1117"
+                            CornerRadius="6"
+                            Padding="12"
+                            BorderBrush="#30363d"
+                            BorderThickness="1"
+                            Margin="0,0,0,8">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton Content="Internal User (Same System)"
+                                       IsChecked="{Binding RecipientType, Converter={StaticResource RecipientTypeConverter}, ConverterParameter=Internal}"
+                                       Foreground="#c9d1d9"
+                                       Margin="0,0,20,0"
+                                       GroupName="RecipientType"/>
+                            <RadioButton Content="External User (Different System)"
+                                       IsChecked="{Binding RecipientType, Converter={StaticResource RecipientTypeConverter}, ConverterParameter=External}"
+                                       Foreground="#58a6ff"
+                                       GroupName="RecipientType"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Internal User Selection -->
+                    <Border Visibility="{Binding RecipientType, Converter={StaticResource RecipientTypeConverter}, ConverterParameter=Internal}">
+                        <StackPanel>
+                            <TextBlock Text="🔑 Select Consumer User" Style="{StaticResource Label}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <ComboBox Grid.Column="0"
+                                         ItemsSource="{Binding AvailableUsers}"
+                                         SelectedItem="{Binding SelectedConsumerUsername}"
+                                         Height="44"
+                                         FontSize="14"
+                                         Margin="0,0,8,8">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" Foreground="#c9d1d9"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                
+                                <Button Grid.Column="1"
+                                       Content="🔄"
+                                       Command="{Binding RefreshUsersCommand}"
+                                       Style="{StaticResource BrowseButton}"
+                                       Width="44"
+                                       Margin="0,0,0,8"
+                                       ToolTip="Refresh user list"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- External User Public Key -->
+                    <Border Visibility="{Binding RecipientType, Converter={StaticResource RecipientTypeConverter}, ConverterParameter=External}">
+                        <StackPanel>
+                            <TextBlock Text="🔑 External User Public Keys" Style="{StaticResource Label}"/>
+                            <Border Background="#0d1117" 
+                                   CornerRadius="6" 
+                                   Padding="12"
+                                   BorderBrush="#30363d"
+                                   BorderThickness="1"
+                                   Margin="0,0,0,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding ExternalRecipientName}"
+                                                  Foreground="#58a6ff"
+                                                  FontSize="13"
+                                                  FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding ExternalPublicKeyPath}"
+                                                  Foreground="#7d8590"
+                                                  FontSize="11"
+                                                  TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                    
+                                    <Button Grid.Column="1"
+                                           Content="Load Keys"
+                                           Command="{Binding BrowseExternalPublicKeyCommand}"
+                                           Style="{StaticResource BrowseButton}"
+                                           Margin="8,0,0,0"/>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
             </Border>
 
@@ -218,8 +373,7 @@
                     <ComboBox SelectedValue="{Binding SelectedAlgorithm}"
                              Height="44"
                              Margin="0,0,0,8"
-                             FontSize="14"
-                             Foreground="White">
+                             FontSize="14">
                         <ComboBox.ItemsSource>
                             <x:Array Type="models:SymmetricAlgorithmType">
                                 <models:SymmetricAlgorithmType>AES</models:SymmetricAlgorithmType>

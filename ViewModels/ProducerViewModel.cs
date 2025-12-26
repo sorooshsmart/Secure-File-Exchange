@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Data;
 using Microsoft.Win32;
 using SecureFileExchange.Commands;
 using SecureFileExchange.Cryptography;
@@ -17,6 +18,8 @@ namespace SecureFileExchange.ViewModels
     {
         private string _selectedFilePath = string.Empty;
         private string _selectedConsumerUsername = string.Empty;
+        private string _externalPublicKeyPath = string.Empty;
+        private string _externalRecipientName = string.Empty;
         private string _sharedPassword = string.Empty;
         private string _sharedKeyFilePath = string.Empty;
         private Models.EncryptionMethod _selectedMethod = Models.EncryptionMethod.SecureEnvelope;
@@ -24,8 +27,12 @@ namespace SecureFileExchange.ViewModels
         private Models.EncryptionMode _selectedMode = Models.EncryptionMode.CBC;
         private MACAlgorithmType _selectedMACAlgorithm = MACAlgorithmType.HMACSHA256;
         private KeyGenerationMethod _keyGenMethod = KeyGenerationMethod.Password;
+        private RecipientType _recipientType = RecipientType.Internal;
+        private RSAEncryptionMode _rsaEncryptionMode = RSAEncryptionMode.WithSignature;
         private int _progress;
         private string _statusMessage = string.Empty;
+
+        private ExternalPublicKeys? _loadedExternalKeys;
 
         public string SelectedFilePath
         {
@@ -37,6 +44,18 @@ namespace SecureFileExchange.ViewModels
         {
             get => _selectedConsumerUsername;
             set => SetProperty(ref _selectedConsumerUsername, value);
+        }
+
+        public string ExternalPublicKeyPath
+        {
+            get => _externalPublicKeyPath;
+            set => SetProperty(ref _externalPublicKeyPath, value);
+        }
+
+        public string ExternalRecipientName
+        {
+            get => _externalRecipientName;
+            set => SetProperty(ref _externalRecipientName, value);
         }
 
         public ObservableCollection<string> AvailableUsers { get; } = new ObservableCollection<string>();
@@ -83,6 +102,18 @@ namespace SecureFileExchange.ViewModels
             set => SetProperty(ref _keyGenMethod, value);
         }
 
+        public RecipientType RecipientType
+        {
+            get => _recipientType;
+            set => SetProperty(ref _recipientType, value);
+        }
+
+        public RSAEncryptionMode RSAEncryptionMode
+        {
+            get => _rsaEncryptionMode;
+            set => SetProperty(ref _rsaEncryptionMode, value);
+        }
+
         public int Progress
         {
             get => _progress;
@@ -97,15 +128,19 @@ namespace SecureFileExchange.ViewModels
 
         public ICommand BrowseFileCommand { get; }
         public ICommand BrowseKeyFileCommand { get; }
+        public ICommand BrowseExternalPublicKeyCommand { get; }
         public ICommand EncryptCommand { get; }
         public ICommand RefreshUsersCommand { get; }
+        public ICommand ExportMyPublicKeysCommand { get; }
 
         public ProducerViewModel()
         {
             BrowseFileCommand = new RelayCommand(BrowseFile);
             BrowseKeyFileCommand = new RelayCommand(BrowseKeyFile);
+            BrowseExternalPublicKeyCommand = new RelayCommand(BrowseExternalPublicKey);
             EncryptCommand = new RelayCommand(Encrypt);
             RefreshUsersCommand = new RelayCommand(RefreshUsers);
+            ExportMyPublicKeysCommand = new RelayCommand(ExportMyPublicKeys);
 
             RefreshUsers();
         }
@@ -152,6 +187,79 @@ namespace SecureFileExchange.ViewModels
             }
         }
 
+        private void BrowseExternalPublicKey()
+        {
+            var dialog = new OpenFileDialog
+            {
+                Title = "Select External User's Public Keys File",
+                Filter = "Public Key Files (*.txt)|*.txt|All Files (*.*)|*.*",
+                InitialDirectory = PublicKeyExchangeService.GetExportDirectory()
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    _loadedExternalKeys = PublicKeyExchangeService.ImportPublicKeys(dialog.FileName);
+                    ExternalPublicKeyPath = dialog.FileName;
+                    ExternalRecipientName = _loadedExternalKeys.Username;
+
+                    MessageBox.Show(
+                        $"External public keys loaded successfully!\n\n" +
+                        $"User: {_loadedExternalKeys.Username}\n" +
+                        $"Source: {Path.GetFileName(dialog.FileName)}",
+                        "Success",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"Failed to load external public keys:\n{ex.Message}",
+                        "Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+
+                    ExternalPublicKeyPath = string.Empty;
+                    ExternalRecipientName = string.Empty;
+                    _loadedExternalKeys = null;
+                }
+            }
+        }
+
+        private void ExportMyPublicKeys()
+        {
+            var currentUser = SessionContext.Instance.CurrentUser;
+            if (currentUser == null)
+            {
+                MessageBox.Show("Please login first", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                string exportPath = PublicKeyExchangeService.ExportPublicKeys(currentUser);
+
+                MessageBox.Show(
+                    $"Your public keys have been exported successfully!\n\n" +
+                    $"File: {Path.GetFileName(exportPath)}\n" +
+                    $"Location: {Path.GetDirectoryName(exportPath)}\n\n" +
+                    $"Share this file with others who want to send you encrypted files.",
+                    "Export Successful",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Failed to export public keys:\n{ex.Message}",
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
         private void Encrypt()
         {
             if (string.IsNullOrWhiteSpace(SelectedFilePath))
@@ -184,30 +292,50 @@ namespace SecureFileExchange.ViewModels
 
                 RSAParameters? consumerPublicKey = null;
                 byte[]? symmetricKey = null;
+                RecipientMode recipientMode = RecipientMode.InternalUser;
 
                 // Handle different encryption methods
-                if (SelectedMethod == Models.EncryptionMethod.SecureEnvelope || SelectedMethod == Models.EncryptionMethod.RSADirect)
+                if (SelectedMethod == Models.EncryptionMethod.SecureEnvelope ||
+                    SelectedMethod == Models.EncryptionMethod.RSADirect)
                 {
-                    if (string.IsNullOrWhiteSpace(SelectedConsumerUsername))
+                    // Determine recipient type
+                    if (RecipientType == RecipientType.Internal)
                     {
-                        MessageBox.Show("Please select a consumer user", "Error",
-                            MessageBoxButton.OK, MessageBoxImage.Warning);
-                        Progress = 0;
-                        return;
-                    }
+                        if (string.IsNullOrWhiteSpace(SelectedConsumerUsername))
+                        {
+                            MessageBox.Show("Please select a consumer user", "Error",
+                                MessageBoxButton.OK, MessageBoxImage.Warning);
+                            Progress = 0;
+                            return;
+                        }
 
-                    // Load consumer's public key
-                    try
-                    {
-                        var consumerIdentity = UserIdentityManager.LoadPublicKeysOnly(SelectedConsumerUsername);
-                        consumerPublicKey = consumerIdentity.EncryptionPublicKey;
+                        // Load internal consumer's public key
+                        try
+                        {
+                            var consumerIdentity = UserIdentityManager.LoadPublicKeysOnly(SelectedConsumerUsername);
+                            consumerPublicKey = consumerIdentity.EncryptionPublicKey;
+                            recipientMode = RecipientMode.InternalUser;
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Failed to load consumer public key: {ex.Message}", "Error",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
+                            Progress = 0;
+                            return;
+                        }
                     }
-                    catch (Exception ex)
+                    else // External
                     {
-                        MessageBox.Show($"Failed to load consumer public key: {ex.Message}", "Error",
-                            MessageBoxButton.OK, MessageBoxImage.Error);
-                        Progress = 0;
-                        return;
+                        if (_loadedExternalKeys == null)
+                        {
+                            MessageBox.Show("Please load external user's public keys", "Error",
+                                MessageBoxButton.OK, MessageBoxImage.Warning);
+                            Progress = 0;
+                            return;
+                        }
+
+                        consumerPublicKey = _loadedExternalKeys.EncryptionPublicKey;
+                        recipientMode = RecipientMode.ExternalPublicKey;
                     }
                 }
                 else if (SelectedMethod == Models.EncryptionMethod.Symmetric)
@@ -252,7 +380,9 @@ namespace SecureFileExchange.ViewModels
                     currentUser.SigningPrivateKey.Value,
                     consumerPublicKey,
                     symmetricKey,
-                    SelectedMode
+                    SelectedMode,
+                    recipientMode,
+                    RSAEncryptionMode  // Pass RSA mode
                 );
 
                 Progress = 100;
@@ -279,6 +409,92 @@ namespace SecureFileExchange.ViewModels
                 MessageBox.Show($"Encryption failed: {ex.Message}", "Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+    }
+
+    public enum RecipientType
+    {
+        Internal,
+        External
+    }
+
+    // Converter for RecipientType
+    public class RecipientTypeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is RecipientType recipientType && parameter is string paramStr)
+            {
+                if (paramStr == "Internal")
+                {
+                    if (targetType == typeof(bool))
+                        return recipientType == RecipientType.Internal;
+                    else if (targetType == typeof(System.Windows.Visibility))
+                        return recipientType == RecipientType.Internal ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+                }
+                else if (paramStr == "External")
+                {
+                    if (targetType == typeof(bool))
+                        return recipientType == RecipientType.External;
+                    else if (targetType == typeof(System.Windows.Visibility))
+                        return recipientType == RecipientType.External ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+                }
+            }
+
+            return targetType == typeof(bool) ? false : System.Windows.Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is bool boolValue && boolValue && parameter is string paramStr)
+            {
+                if (paramStr == "Internal")
+                    return RecipientType.Internal;
+                else if (paramStr == "External")
+                    return RecipientType.External;
+            }
+
+            return RecipientType.Internal;
+        }
+    }
+
+    // Converter for RSAEncryptionMode (NEW)
+    public class RSAEncryptionModeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is RSAEncryptionMode mode && parameter is string paramStr)
+            {
+                if (paramStr == "WithSignature")
+                {
+                    if (targetType == typeof(bool))
+                        return mode == RSAEncryptionMode.WithSignature;
+                    else if (targetType == typeof(System.Windows.Visibility))
+                        return mode == RSAEncryptionMode.WithSignature ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+                }
+                else if (paramStr == "NoSignature")
+                {
+                    if (targetType == typeof(bool))
+                        return mode == RSAEncryptionMode.NoSignature;
+                    else if (targetType == typeof(System.Windows.Visibility))
+                        return mode == RSAEncryptionMode.NoSignature ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+                }
+            }
+
+            return targetType == typeof(bool) ? false : System.Windows.Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is bool boolValue && boolValue && parameter is string paramStr)
+            {
+                if (paramStr == "WithSignature")
+                    return RSAEncryptionMode.WithSignature;
+                else if (paramStr == "NoSignature")
+                    return RSAEncryptionMode.NoSignature;
+            }
+
+            return RSAEncryptionMode.WithSignature;
         }
     }
 }

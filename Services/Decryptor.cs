@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Security.Cryptography;
 using SecureFileExchange.Cryptography;
@@ -43,16 +43,17 @@ namespace SecureFileExchange.Services
 
         private byte[] DecryptSecureEnvelope(byte[] encryptedData, RSAParameters privateKey)
         {
+            // Skip first byte (method flag) and second byte (recipient mode)
             // Read key length
-            int keyLength = BitConverter.ToInt32(encryptedData, 1);
+            int keyLength = BitConverter.ToInt32(encryptedData, 2);
 
             // Extract encrypted session key
             byte[] encryptedSessionKey = new byte[keyLength];
-            Array.Copy(encryptedData, 5, encryptedSessionKey, 0, keyLength);
+            Array.Copy(encryptedData, 6, encryptedSessionKey, 0, keyLength);
 
             // Extract encrypted package
-            byte[] encryptedPackage = new byte[encryptedData.Length - 5 - keyLength];
-            Array.Copy(encryptedData, 5 + keyLength, encryptedPackage, 0, encryptedPackage.Length);
+            byte[] encryptedPackage = new byte[encryptedData.Length - 6 - keyLength];
+            Array.Copy(encryptedData, 6 + keyLength, encryptedPackage, 0, encryptedPackage.Length);
 
             // Decrypt session key
             byte[] sessionKey = DigitalSignature.Decrypt(encryptedSessionKey, privateKey);
@@ -64,12 +65,13 @@ namespace SecureFileExchange.Services
 
         private byte[] DecryptSymmetric(byte[] encryptedData, byte[] key)
         {
-            SymmetricAlgorithmType algoType = (SymmetricAlgorithmType)encryptedData[1];
-            Models.EncryptionMode mode = (Models.EncryptionMode)encryptedData[2];
+            // Skip first two bytes (method flag + placeholder)
+            SymmetricAlgorithmType algoType = (SymmetricAlgorithmType)encryptedData[2];
+            Models.EncryptionMode mode = (Models.EncryptionMode)encryptedData[3];
 
             // Extract encrypted package
-            byte[] encryptedPackage = new byte[encryptedData.Length - 3];
-            Array.Copy(encryptedData, 3, encryptedPackage, 0, encryptedPackage.Length);
+            byte[] encryptedPackage = new byte[encryptedData.Length - 4];
+            Array.Copy(encryptedData, 4, encryptedPackage, 0, encryptedPackage.Length);
 
             // Get appropriate decryption algorithm
             Cryptography.Interfaces.ISymmetricEncryption algorithm = algoType switch
@@ -85,11 +87,27 @@ namespace SecureFileExchange.Services
 
         private byte[] DecryptRSADirect(byte[] encryptedData, RSAParameters privateKey)
         {
-            // Extract encrypted package
-            byte[] encryptedPackage = new byte[encryptedData.Length - 1];
-            Array.Copy(encryptedData, 1, encryptedPackage, 0, encryptedPackage.Length);
+            // Check if this is NoSignature mode (educational)
+            bool isNoSignature = encryptedData.Length > 2 && encryptedData[2] == 0x00;
 
-            return DigitalSignature.Decrypt(encryptedPackage, privateKey);
+            if (isNoSignature)
+            {
+                // Skip first 3 bytes: [method flag][recipient mode][0x00 = NoSignature]
+                byte[] encryptedPackage = new byte[encryptedData.Length - 3];
+                Array.Copy(encryptedData, 3, encryptedPackage, 0, encryptedPackage.Length);
+
+                // Direct RSA decryption - returns RAW file data
+                return DigitalSignature.Decrypt(encryptedPackage, privateKey);
+            }
+            else
+            {
+                // Original mode: Skip first 3 bytes [method flag][recipient mode][0x01 = WithSignature]
+                byte[] encryptedPackage = new byte[encryptedData.Length - 3];
+                Array.Copy(encryptedData, 3, encryptedPackage, 0, encryptedPackage.Length);
+
+                // Returns package with signature + data + MAC
+                return DigitalSignature.Decrypt(encryptedPackage, privateKey);
+            }
         }
 
         public (byte[] originalData, string extension) VerifyAndExtractData(byte[] packageData, RSAParameters publicKeySigning)
@@ -131,6 +149,20 @@ namespace SecureFileExchange.Services
             return (originalData, extension);
         }
 
+        public RecipientMode GetRecipientMode(byte[] encryptedData)
+        {
+            if (encryptedData == null || encryptedData.Length < 2)
+                return RecipientMode.InternalUser;
+
+            Models.EncryptionMethod method = (Models.EncryptionMethod)encryptedData[0];
+
+            // Symmetric doesn't use recipient mode
+            if (method == Models.EncryptionMethod.Symmetric)
+                return RecipientMode.InternalUser;
+
+            return (RecipientMode)encryptedData[1];
+        }
+
         public DecryptionResult DecryptFile(
             string encryptedFilePath,
             RSAParameters signingPublicKey,
@@ -142,32 +174,71 @@ namespace SecureFileExchange.Services
                 // Read encrypted file
                 byte[] encryptedData = StorageService.LoadEncryptedFile(encryptedFilePath);
 
-                // Decrypt package
-                byte[] packageData = DecryptPackage(encryptedData, encryptionPrivateKey, symmetricKey);
+                Models.EncryptionMethod method = (Models.EncryptionMethod)encryptedData[0];
 
-                // Verify signature and extract data with original extension
-                var (originalData, extension) = VerifyAndExtractData(packageData, signingPublicKey);
+                // Check if RSA Direct (No Signature) mode
+                bool isRSADirectNoSignature = method == Models.EncryptionMethod.RSADirect &&
+                                              encryptedData.Length > 2 &&
+                                              encryptedData[2] == 0x00;
 
-                // Create output filename with correct extension
-                string baseFileName = Path.GetFileNameWithoutExtension(encryptedFilePath);
-                if (baseFileName.EndsWith(".enc"))
+                if (isRSADirectNoSignature)
                 {
-                    baseFileName = Path.GetFileNameWithoutExtension(baseFileName);
+                    // RSA Direct (No Signature) - Educational Mode
+                    if (encryptionPrivateKey == null)
+                        throw new ArgumentNullException("Private key is required for RSA Direct decryption");
+
+                    // Decrypt directly - no signature/MAC verification
+                    byte[] decryptedData = DecryptPackage(encryptedData, encryptionPrivateKey, symmetricKey);
+
+                    // Save output file
+                    string baseFileName = Path.GetFileNameWithoutExtension(encryptedFilePath);
+                    if (baseFileName.EndsWith(".enc"))
+                    {
+                        baseFileName = Path.GetFileNameWithoutExtension(baseFileName);
+                    }
+
+                    string outputFileName = baseFileName + "_decrypted.bin";
+                    string outputPath = Path.Combine(StorageService.GetOutputDirectory(), outputFileName);
+
+                    File.WriteAllBytes(outputPath, decryptedData);
+
+                    return new DecryptionResult
+                    {
+                        Success = true,
+                        Message = "File decrypted successfully (RSA Direct - No Signature mode)\n⚠️ This file was NOT authenticated or integrity-checked!",
+                        DecryptedData = decryptedData,
+                        OutputPath = outputPath
+                    };
                 }
-
-                string outputFileName = baseFileName + "_decrypted" + extension;
-                string outputPath = Path.Combine(StorageService.GetOutputDirectory(), outputFileName);
-
-                // Save decrypted file with original extension
-                File.WriteAllBytes(outputPath, originalData);
-
-                return new DecryptionResult
+                else
                 {
-                    Success = true,
-                    Message = $"File decrypted and verified successfully\nOriginal type: {extension}",
-                    DecryptedData = originalData,
-                    OutputPath = outputPath
-                };
+                    // Standard mode with signature verification
+                    byte[] packageData = DecryptPackage(encryptedData, encryptionPrivateKey, symmetricKey);
+
+                    // Verify signature and extract data with original extension
+                    var (originalData, extension) = VerifyAndExtractData(packageData, signingPublicKey);
+
+                    // Create output filename with correct extension
+                    string baseFileName = Path.GetFileNameWithoutExtension(encryptedFilePath);
+                    if (baseFileName.EndsWith(".enc"))
+                    {
+                        baseFileName = Path.GetFileNameWithoutExtension(baseFileName);
+                    }
+
+                    string outputFileName = baseFileName + "_decrypted" + extension;
+                    string outputPath = Path.Combine(StorageService.GetOutputDirectory(), outputFileName);
+
+                    // Save decrypted file with original extension
+                    File.WriteAllBytes(outputPath, originalData);
+
+                    return new DecryptionResult
+                    {
+                        Success = true,
+                        Message = $"File decrypted and verified successfully\nOriginal type: {extension}",
+                        DecryptedData = originalData,
+                        OutputPath = outputPath
+                    };
+                }
             }
             catch (Exception ex)
             {

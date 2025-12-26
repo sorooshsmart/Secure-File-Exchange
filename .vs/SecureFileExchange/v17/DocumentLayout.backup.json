@@ -1,0 +1,358 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\viewmodels\\producerviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:viewmodels\\producerviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\cryptography\\keymanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:cryptography\\keymanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\cryptography\\digitalsignature.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:cryptography\\digitalsignature.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\services\\decryptor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:services\\decryptor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\services\\encryptor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:services\\encryptor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\cryptography\\cryptoutils.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:cryptography\\cryptoutils.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\cryptography\\symmetric\\tripledesencryption.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:cryptography\\symmetric\\tripledesencryption.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\cryptography\\symmetric\\desencryption.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:cryptography\\symmetric\\desencryption.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\cryptography\\symmetric\\aesencryption.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:cryptography\\symmetric\\aesencryption.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\cryptography\\mac\\hmacsha256algorithm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:cryptography\\mac\\hmacsha256algorithm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\cryptography\\mac\\cmacalgorithm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:cryptography\\mac\\cmacalgorithm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\cryptography\\mac\\ccmalgorithm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:cryptography\\mac\\ccmalgorithm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\cryptography\\interfaces\\imacalgorithm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:cryptography\\interfaces\\imacalgorithm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\services\\publickeyexchangeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:services\\publickeyexchangeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\services\\storageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:services\\storageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\models\\externalpublickeys.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:models\\externalpublickeys.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\viewmodels\\consumerviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:viewmodels\\consumerviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\views\\producerview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:views\\producerview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|c:\\users\\hp\\source\\repos\\securefileexchange\\securefileexchange\\converters\\additionalconverters.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{92F8B1CD-3533-406C-90CA-30A6F9C04081}|SecureFileExchange.csproj|solutionrelative:converters\\additionalconverters.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 7,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "KeyManager.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\KeyManager.cs",
+              "RelativeDocumentMoniker": "Cryptography\\KeyManager.cs",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\KeyManager.cs",
+              "RelativeToolTip": "Cryptography\\KeyManager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T17:40:33.206Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "CryptoUtils.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\CryptoUtils.cs",
+              "RelativeDocumentMoniker": "Cryptography\\CryptoUtils.cs",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\CryptoUtils.cs",
+              "RelativeToolTip": "Cryptography\\CryptoUtils.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEIAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T15:01:34.002Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "TripleDESEncryption.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\Symmetric\\TripleDESEncryption.cs",
+              "RelativeDocumentMoniker": "Cryptography\\Symmetric\\TripleDESEncryption.cs",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\Symmetric\\TripleDESEncryption.cs",
+              "RelativeToolTip": "Cryptography\\Symmetric\\TripleDESEncryption.cs",
+              "ViewState": "AgIAAF4AAAAAAAAAAAAkwGAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T15:00:45.698Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "DESEncryption.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\Symmetric\\DESEncryption.cs",
+              "RelativeDocumentMoniker": "Cryptography\\Symmetric\\DESEncryption.cs",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\Symmetric\\DESEncryption.cs",
+              "RelativeToolTip": "Cryptography\\Symmetric\\DESEncryption.cs",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAYwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T15:00:35.959Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "AESEncryption.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\Symmetric\\AESEncryption.cs",
+              "RelativeDocumentMoniker": "Cryptography\\Symmetric\\AESEncryption.cs",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\Symmetric\\AESEncryption.cs",
+              "RelativeToolTip": "Cryptography\\Symmetric\\AESEncryption.cs",
+              "ViewState": "AgIAADwAAAAAAAAAAAAYwFcAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T14:54:21.617Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Decryptor.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Services\\Decryptor.cs",
+              "RelativeDocumentMoniker": "Services\\Decryptor.cs",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Services\\Decryptor.cs",
+              "RelativeToolTip": "Services\\Decryptor.cs",
+              "ViewState": "AgIAAG4AAAAAAAAAAAAQwH4AAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T12:51:34.008Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Encryptor.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Services\\Encryptor.cs",
+              "RelativeDocumentMoniker": "Services\\Encryptor.cs",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Services\\Encryptor.cs",
+              "RelativeToolTip": "Services\\Encryptor.cs",
+              "ViewState": "AgIAADIAAAAAAAAAAAAYwEMAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T12:51:12.866Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ProducerViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\ViewModels\\ProducerViewModel.cs",
+              "RelativeDocumentMoniker": "ViewModels\\ProducerViewModel.cs",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\ViewModels\\ProducerViewModel.cs",
+              "RelativeToolTip": "ViewModels\\ProducerViewModel.cs",
+              "ViewState": "AgIAAOQBAAAAAAAAAAAAAPMBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T12:52:04.127Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "DigitalSignature.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\DigitalSignature.cs",
+              "RelativeDocumentMoniker": "Cryptography\\DigitalSignature.cs",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\DigitalSignature.cs",
+              "RelativeToolTip": "Cryptography\\DigitalSignature.cs",
+              "ViewState": "AgIAABYAAAAAAAAAAAAgwCcAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T15:11:06.598Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "HMACSHA256Algorithm.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\MAC\\HMACSHA256Algorithm.cs",
+              "RelativeDocumentMoniker": "Cryptography\\MAC\\HMACSHA256Algorithm.cs",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\MAC\\HMACSHA256Algorithm.cs",
+              "RelativeToolTip": "Cryptography\\MAC\\HMACSHA256Algorithm.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T14:50:42.334Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "CMACAlgorithm.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\MAC\\CMACAlgorithm.cs",
+              "RelativeDocumentMoniker": "Cryptography\\MAC\\CMACAlgorithm.cs",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\MAC\\CMACAlgorithm.cs",
+              "RelativeToolTip": "Cryptography\\MAC\\CMACAlgorithm.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T14:47:14.397Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "CCMAlgorithm.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\MAC\\CCMAlgorithm.cs",
+              "RelativeDocumentMoniker": "Cryptography\\MAC\\CCMAlgorithm.cs",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\MAC\\CCMAlgorithm.cs",
+              "RelativeToolTip": "Cryptography\\MAC\\CCMAlgorithm.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T14:41:05.473Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "IMACAlgorithm.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\Interfaces\\IMACAlgorithm.cs",
+              "RelativeDocumentMoniker": "Cryptography\\Interfaces\\IMACAlgorithm.cs",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Cryptography\\Interfaces\\IMACAlgorithm.cs",
+              "RelativeToolTip": "Cryptography\\Interfaces\\IMACAlgorithm.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T14:40:50.038Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "StorageService.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Services\\StorageService.cs",
+              "RelativeDocumentMoniker": "Services\\StorageService.cs",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Services\\StorageService.cs",
+              "RelativeToolTip": "Services\\StorageService.cs",
+              "ViewState": "AgIAAE4AAAAAAAAAAAAiwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T12:54:05.511Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "App.xaml",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\App.xaml",
+              "RelativeDocumentMoniker": "App.xaml",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\App.xaml",
+              "RelativeToolTip": "App.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-12-25T22:36:28.021Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "ExternalPublicKeys.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Models\\ExternalPublicKeys.cs",
+              "RelativeDocumentMoniker": "Models\\ExternalPublicKeys.cs",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Models\\ExternalPublicKeys.cs",
+              "RelativeToolTip": "Models\\ExternalPublicKeys.cs",
+              "ViewState": "AgIAAAEAAAAAAAAAAAAuwBgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T12:50:39.145Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "PublicKeyExchangeService.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Services\\PublicKeyExchangeService.cs",
+              "RelativeDocumentMoniker": "Services\\PublicKeyExchangeService.cs",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Services\\PublicKeyExchangeService.cs",
+              "RelativeToolTip": "Services\\PublicKeyExchangeService.cs",
+              "ViewState": "AgIAADkAAAAAAAAAAAAqwEUAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T12:50:04.179Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "AdditionalConverters.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Converters\\AdditionalConverters.cs",
+              "RelativeDocumentMoniker": "Converters\\AdditionalConverters.cs",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Converters\\AdditionalConverters.cs",
+              "RelativeToolTip": "Converters\\AdditionalConverters.cs",
+              "ViewState": "AgIAAE4AAAAAAAAAAAAuwGUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T22:36:03.207Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "ConsumerViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\ViewModels\\ConsumerViewModel.cs",
+              "RelativeDocumentMoniker": "ViewModels\\ConsumerViewModel.cs",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\ViewModels\\ConsumerViewModel.cs",
+              "RelativeToolTip": "ViewModels\\ConsumerViewModel.cs",
+              "ViewState": "AgIAANUAAAAAAAAAAAAAAGwBAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T17:12:17.463Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "ProducerView.xaml",
+              "DocumentMoniker": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Views\\ProducerView.xaml",
+              "RelativeDocumentMoniker": "Views\\ProducerView.xaml",
+              "ToolTip": "C:\\Users\\HP\\source\\repos\\SecureFileExchange\\SecureFileExchange\\Views\\ProducerView.xaml",
+              "RelativeToolTip": "Views\\ProducerView.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-12-25T17:16:49.715Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

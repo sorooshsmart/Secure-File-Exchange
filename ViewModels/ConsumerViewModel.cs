@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Data;
 using Microsoft.Win32;
 using SecureFileExchange.Commands;
 using SecureFileExchange.Cryptography;
@@ -17,11 +18,16 @@ namespace SecureFileExchange.ViewModels
     {
         private string _encryptedFilePath = string.Empty;
         private string _selectedProducerUsername = string.Empty;
+        private string _externalPublicKeyPath = string.Empty;
+        private string _externalSenderName = string.Empty;
         private string _sharedPassword = string.Empty;
         private string _sharedKeyFilePath = string.Empty;
         private KeyGenerationMethod _keyGenMethod = KeyGenerationMethod.Password;
+        private SenderType _senderType = SenderType.Internal;
         private int _progress;
         private string _statusMessage = string.Empty;
+
+        private ExternalPublicKeys? _loadedExternalKeys;
 
         public string EncryptedFilePath
         {
@@ -33,6 +39,18 @@ namespace SecureFileExchange.ViewModels
         {
             get => _selectedProducerUsername;
             set => SetProperty(ref _selectedProducerUsername, value);
+        }
+
+        public string ExternalPublicKeyPath
+        {
+            get => _externalPublicKeyPath;
+            set => SetProperty(ref _externalPublicKeyPath, value);
+        }
+
+        public string ExternalSenderName
+        {
+            get => _externalSenderName;
+            set => SetProperty(ref _externalSenderName, value);
         }
 
         public ObservableCollection<string> AvailableUsers { get; } = new ObservableCollection<string>();
@@ -55,6 +73,12 @@ namespace SecureFileExchange.ViewModels
             set => SetProperty(ref _keyGenMethod, value);
         }
 
+        public SenderType SenderType
+        {
+            get => _senderType;
+            set => SetProperty(ref _senderType, value);
+        }
+
         public int Progress
         {
             get => _progress;
@@ -69,6 +93,7 @@ namespace SecureFileExchange.ViewModels
 
         public ICommand BrowseEncryptedFileCommand { get; }
         public ICommand BrowseKeyFileCommand { get; }
+        public ICommand BrowseExternalPublicKeyCommand { get; }
         public ICommand DecryptCommand { get; }
         public ICommand RefreshUsersCommand { get; }
 
@@ -76,6 +101,7 @@ namespace SecureFileExchange.ViewModels
         {
             BrowseEncryptedFileCommand = new RelayCommand(BrowseEncryptedFile);
             BrowseKeyFileCommand = new RelayCommand(BrowseKeyFile);
+            BrowseExternalPublicKeyCommand = new RelayCommand(BrowseExternalPublicKey);
             DecryptCommand = new RelayCommand(Decrypt);
             RefreshUsersCommand = new RelayCommand(RefreshUsers);
 
@@ -107,6 +133,33 @@ namespace SecureFileExchange.ViewModels
             if (dialog.ShowDialog() == true)
             {
                 EncryptedFilePath = dialog.FileName;
+                
+                // Try to auto-detect sender type from file
+                try
+                {
+                    byte[] encryptedData = File.ReadAllBytes(dialog.FileName);
+                    var decryptor = new Decryptor();
+                    RecipientMode mode = decryptor.GetRecipientMode(encryptedData);
+                    
+                    if (mode == RecipientMode.ExternalPublicKey)
+                    {
+                        SenderType = SenderType.External;
+                        MessageBox.Show(
+                            "This file was encrypted by an external user.\n" +
+                            "Please load the sender's public keys file.",
+                            "External Sender Detected",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        SenderType = SenderType.Internal;
+                    }
+                }
+                catch
+                {
+                    // Ignore errors, user will select manually
+                }
             }
         }
 
@@ -124,18 +177,51 @@ namespace SecureFileExchange.ViewModels
             }
         }
 
+        private void BrowseExternalPublicKey()
+        {
+            var dialog = new OpenFileDialog
+            {
+                Title = "Select Sender's Public Keys File",
+                Filter = "Public Key Files (*.txt)|*.txt|All Files (*.*)|*.*",
+                InitialDirectory = PublicKeyExchangeService.GetExportDirectory()
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    _loadedExternalKeys = PublicKeyExchangeService.ImportPublicKeys(dialog.FileName);
+                    ExternalPublicKeyPath = dialog.FileName;
+                    ExternalSenderName = _loadedExternalKeys.Username;
+                    
+                    MessageBox.Show(
+                        $"External public keys loaded successfully!\n\n" +
+                        $"Sender: {_loadedExternalKeys.Username}\n" +
+                        $"Source: {Path.GetFileName(dialog.FileName)}",
+                        "Success",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"Failed to load external public keys:\n{ex.Message}",
+                        "Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                    
+                    ExternalPublicKeyPath = string.Empty;
+                    ExternalSenderName = string.Empty;
+                    _loadedExternalKeys = null;
+                }
+            }
+        }
+
         private void Decrypt()
         {
             if (string.IsNullOrWhiteSpace(EncryptedFilePath))
             {
                 MessageBox.Show("Please select an encrypted file", "Error",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(SelectedProducerUsername))
-            {
-                MessageBox.Show("Please select the producer user who encrypted this file", "Error",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -155,21 +241,6 @@ namespace SecureFileExchange.ViewModels
                     return;
                 }
 
-                // Load producer's signing public key
-                RSAParameters producerSigningPublicKey;
-                try
-                {
-                    var producerIdentity = UserIdentityManager.LoadPublicKeysOnly(SelectedProducerUsername);
-                    producerSigningPublicKey = producerIdentity.SigningPublicKey;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Failed to load producer public key: {ex.Message}", "Error",
-                        MessageBoxButton.OK, MessageBoxImage.Error);
-                    Progress = 0;
-                    return;
-                }
-
                 // Load encrypted file to determine method
                 byte[] encryptedData = File.ReadAllBytes(EncryptedFilePath);
                 Models.EncryptionMethod method = (Models.EncryptionMethod)encryptedData[0];
@@ -178,19 +249,52 @@ namespace SecureFileExchange.ViewModels
                 StatusMessage = "Preparing decryption...";
 
                 RSAParameters? encryptionPrivateKey = currentUser.EncryptionPrivateKey;
+                RSAParameters producerSigningPublicKey;
                 byte[]? symmetricKey = null;
 
-                // Handle different encryption methods
-                if (method == Models.EncryptionMethod.SecureEnvelope || method == Models.EncryptionMethod.RSADirect)
+                // Load producer's signing public key based on sender type
+                if (SenderType == SenderType.Internal)
                 {
-                    // These methods use consumer's private key (already loaded)
-                    // No additional input needed from user
+                    if (string.IsNullOrWhiteSpace(SelectedProducerUsername))
+                    {
+                        MessageBox.Show("Please select the producer user who encrypted this file", "Error",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                        Progress = 0;
+                        return;
+                    }
+
+                    // Load internal producer's signing public key
+                    try
+                    {
+                        var producerIdentity = UserIdentityManager.LoadPublicKeysOnly(SelectedProducerUsername);
+                        producerSigningPublicKey = producerIdentity.SigningPublicKey;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Failed to load producer public key: {ex.Message}", "Error",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+                        Progress = 0;
+                        return;
+                    }
                 }
-                else if (method == Models.EncryptionMethod.Symmetric)
+                else // External
+                {
+                    if (_loadedExternalKeys == null)
+                    {
+                        MessageBox.Show("Please load external sender's public keys", "Error",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                        Progress = 0;
+                        return;
+                    }
+
+                    producerSigningPublicKey = _loadedExternalKeys.SigningPublicKey;
+                }
+
+                // Handle symmetric encryption key if needed
+                if (method == Models.EncryptionMethod.Symmetric)
                 {
                     // Symmetric method REQUIRES key from user
-                    // Get symmetric key
-                    SymmetricAlgorithmType algoType = (SymmetricAlgorithmType)encryptedData[1];
+                    SymmetricAlgorithmType algoType = (SymmetricAlgorithmType)encryptedData[2];
                     int keyLength = algoType == SymmetricAlgorithmType.AES ? 32 :
                                    algoType == SymmetricAlgorithmType.TripleDES ? 24 : 8;
 
@@ -237,8 +341,17 @@ namespace SecureFileExchange.ViewModels
                 if (result.Success)
                 {
                     StatusMessage = "Decryption successful!";
-                    MessageBox.Show($"File decrypted and verified successfully!\nSaved to: {result.OutputPath}",
-                        "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    string senderInfo = SenderType == SenderType.Internal 
+                        ? SelectedProducerUsername 
+                        : $"{ExternalSenderName} (External)";
+                    
+                    MessageBox.Show(
+                        $"File decrypted and verified successfully!\n\n" +
+                        $"Sender: {senderInfo}\n" +
+                        $"Saved to: {result.OutputPath}",
+                        "Success", 
+                        MessageBoxButton.OK, 
+                        MessageBoxImage.Information);
                 }
                 else
                 {
@@ -256,6 +369,69 @@ namespace SecureFileExchange.ViewModels
                 MessageBox.Show($"Decryption failed: {ex.Message}", "Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+    }
+
+    public enum SenderType
+    {
+        Internal,
+        External
+    }
+
+    // Converter for SenderType
+    public class SenderTypeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is SenderType senderType && parameter is string paramStr)
+            {
+                if (paramStr == "Internal")
+                {
+                    if (targetType == typeof(bool))
+                        return senderType == SenderType.Internal;
+                    else if (targetType == typeof(System.Windows.Visibility))
+                        return senderType == SenderType.Internal ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+                }
+                else if (paramStr == "External")
+                {
+                    if (targetType == typeof(bool))
+                        return senderType == SenderType.External;
+                    else if (targetType == typeof(System.Windows.Visibility))
+                        return senderType == SenderType.External ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+                }
+            }
+
+            return targetType == typeof(bool) ? false : System.Windows.Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is bool boolValue && boolValue && parameter is string paramStr)
+            {
+                if (paramStr == "Internal")
+                    return SenderType.Internal;
+                else if (paramStr == "External")
+                    return SenderType.External;
+            }
+
+            return SenderType.Internal;
+        }
+    }
+
+    // Converter for String to Visibility
+    public class StringToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is string str && !string.IsNullOrWhiteSpace(str))
+                return System.Windows.Visibility.Visible;
+
+            return System.Windows.Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

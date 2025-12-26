@@ -77,7 +77,7 @@ namespace SecureFileExchange.Services
             return package;
         }
 
-        public byte[] EncryptSecureEnvelope(byte[] packageData, RSAParameters consumerPublicKey)
+        public byte[] EncryptSecureEnvelope(byte[] packageData, RSAParameters consumerPublicKey, RecipientMode recipientMode)
         {
             // Generate random session key
             byte[] sessionKey = CryptoUtils.GenerateRandomBytes(32);
@@ -89,13 +89,14 @@ namespace SecureFileExchange.Services
             // Encrypt session key with consumer's public key
             byte[] encryptedSessionKey = DigitalSignature.Encrypt(sessionKey, consumerPublicKey);
 
-            // Build final structure: [0x01][key_length(4)][encrypted_key][encrypted_package]
-            byte[] result = new byte[1 + 4 + encryptedSessionKey.Length + encryptedPackage.Length];
+            // Build final structure: [0x01][recipient_mode][key_length(4)][encrypted_key][encrypted_package]
+            byte[] result = new byte[2 + 4 + encryptedSessionKey.Length + encryptedPackage.Length];
 
             result[0] = (byte)Models.EncryptionMethod.SecureEnvelope;
-            BitConverter.GetBytes(encryptedSessionKey.Length).CopyTo(result, 1);
-            encryptedSessionKey.CopyTo(result, 5);
-            encryptedPackage.CopyTo(result, 5 + encryptedSessionKey.Length);
+            result[1] = (byte)recipientMode; // NEW: Recipient mode flag
+            BitConverter.GetBytes(encryptedSessionKey.Length).CopyTo(result, 2);
+            encryptedSessionKey.CopyTo(result, 6);
+            encryptedPackage.CopyTo(result, 6 + encryptedSessionKey.Length);
 
             return result;
         }
@@ -104,42 +105,72 @@ namespace SecureFileExchange.Services
         {
             byte[] encryptedPackage = _symmetricEncryption.Encrypt(packageData, key, mode);
 
-            // Structure: [0x02][algo_type][mode_type][encrypted_package]
-            byte[] result = new byte[3 + encryptedPackage.Length];
+            // Structure: [0x02][0x00][algo_type][mode_type][encrypted_package]
+            // 0x00 is placeholder for recipient mode (not used in symmetric)
+            byte[] result = new byte[4 + encryptedPackage.Length];
 
             result[0] = (byte)Models.EncryptionMethod.Symmetric;
-            result[1] = (byte)_symmetricEncryption.GetAlgorithmType();
-            result[2] = (byte)mode;
+            result[1] = 0x00; // Placeholder for consistency
+            result[2] = (byte)_symmetricEncryption.GetAlgorithmType();
+            result[3] = (byte)mode;
 
-            encryptedPackage.CopyTo(result, 3);
+            encryptedPackage.CopyTo(result, 4);
 
             return result;
         }
 
-        public byte[] EncryptRSADirect(byte[] packageData, RSAParameters consumerPublicKey)
+        public byte[] EncryptRSADirect(byte[] packageData, RSAParameters consumerPublicKey, RecipientMode recipientMode, RSAEncryptionMode rsaMode = RSAEncryptionMode.WithSignature)
         {
-            // Note: packageData already contains: signature + data + MAC
-            // RSA-2048 with OAEP-SHA256 can encrypt maximum 190 bytes
-            // We need to check the PACKAGE size, not original file size
-
-            if (packageData.Length > 190)
+            if (rsaMode == RSAEncryptionMode.WithSignature)
             {
-                throw new InvalidOperationException(
-                    $"Package is too large for RSA direct encryption.\n" +
-                    $"Package size (with signature+MAC): {packageData.Length} bytes\n" +
-                    $"Maximum allowed: 190 bytes\n\n" +
-                    $"The original file was too large after adding security layers.\n" +
-                    $"Please use Secure Envelope or Symmetric encryption instead.");
+                // ORIGINAL MODE: packageData contains signature + data + MAC
+                // RSA-2048 with OAEP-SHA256 can encrypt maximum 190 bytes
+                if (packageData.Length > 190)
+                {
+                    throw new InvalidOperationException(
+                        $"Package is too large for RSA direct encryption.\n" +
+                        $"Package size (with signature+MAC): {packageData.Length} bytes\n" +
+                        $"Maximum allowed: 190 bytes\n\n" +
+                        $"The original file was too large after adding security layers.\n" +
+                        $"Please use Secure Envelope or Symmetric encryption instead.");
+                }
+
+                byte[] encryptedPackage = DigitalSignature.Encrypt(packageData, consumerPublicKey);
+
+                // Structure: [0x03][recipient_mode][0x01][encrypted_package]
+                byte[] result = new byte[3 + encryptedPackage.Length];
+                result[0] = (byte)Models.EncryptionMethod.RSADirect;
+                result[1] = (byte)recipientMode;
+                result[2] = 0x01; // WithSignature flag
+                encryptedPackage.CopyTo(result, 3);
+
+                return result;
             }
+            else // NoSignature - EDUCATIONAL MODE
+            {
+                // packageData is RAW file data (no signature, no MAC)
+                // RSA-2048 with OAEP-SHA256 can encrypt maximum 190 bytes
+                if (packageData.Length > 190)
+                {
+                    throw new InvalidOperationException(
+                        $"RSA Direct (No Signature) supports only very small files.\n" +
+                        $"File size: {packageData.Length} bytes\n" +
+                        $"Maximum allowed: 190 bytes\n\n" +
+                        $"This mode is for EDUCATIONAL purposes only.\n" +
+                        $"Please use Secure Envelope for real data.");
+                }
 
-            byte[] encryptedPackage = DigitalSignature.Encrypt(packageData, consumerPublicKey);
+                byte[] encryptedData = DigitalSignature.Encrypt(packageData, consumerPublicKey);
 
-            // Structure: [0x03][encrypted_package]
-            byte[] result = new byte[1 + encryptedPackage.Length];
-            result[0] = (byte)Models.EncryptionMethod.RSADirect;
-            encryptedPackage.CopyTo(result, 1);
+                // Structure: [0x03][recipient_mode][0x00][encrypted_data]
+                byte[] result = new byte[3 + encryptedData.Length];
+                result[0] = (byte)Models.EncryptionMethod.RSADirect;
+                result[1] = (byte)recipientMode;
+                result[2] = 0x00; // NoSignature flag
+                encryptedData.CopyTo(result, 3);
 
-            return result;
+                return result;
+            }
         }
 
         public EncryptionResult EncryptFile(
@@ -148,7 +179,9 @@ namespace SecureFileExchange.Services
             RSAParameters signingPrivateKey,
             RSAParameters? consumerPublicKey = null,
             byte[]? symmetricKey = null,
-            Models.EncryptionMode symmetricMode = Models.EncryptionMode.CBC)
+            Models.EncryptionMode symmetricMode = Models.EncryptionMode.CBC,
+            RecipientMode recipientMode = RecipientMode.InternalUser,
+            RSAEncryptionMode rsaMode = RSAEncryptionMode.WithSignature)
         {
             try
             {
@@ -156,31 +189,43 @@ namespace SecureFileExchange.Services
                 byte[] fileData = File.ReadAllBytes(inputFilePath);
                 string originalFileName = Path.GetFileName(inputFilePath);
 
-                // Create package (extension + data + MAC + signature)
-                byte[] package = CreatePackage(fileData, signingPrivateKey, originalFileName);
-
                 byte[]? encryptedData = null;
 
-                // Encrypt based on method
-                switch (method)
+                // Handle RSA Direct (No Signature) separately
+                if (method == Models.EncryptionMethod.RSADirect && rsaMode == RSAEncryptionMode.NoSignature)
                 {
-                    case Models.EncryptionMethod.SecureEnvelope:
-                        if (consumerPublicKey == null)
-                            throw new ArgumentNullException("Consumer public key is required for Secure Envelope");
-                        encryptedData = EncryptSecureEnvelope(package, consumerPublicKey.Value);
-                        break;
+                    if (consumerPublicKey == null)
+                        throw new ArgumentNullException("Consumer public key is required for RSA Direct");
 
-                    case Models.EncryptionMethod.Symmetric:
-                        if (symmetricKey == null)
-                            throw new ArgumentNullException("Symmetric key is required");
-                        encryptedData = EncryptSymmetric(package, symmetricKey, symmetricMode);
-                        break;
+                    // Direct RSA encryption on raw file data (NO signature, NO MAC)
+                    encryptedData = EncryptRSADirect(fileData, consumerPublicKey.Value, recipientMode, RSAEncryptionMode.NoSignature);
+                }
+                else
+                {
+                    // Standard flow: Create package with signature + MAC
+                    byte[] package = CreatePackage(fileData, signingPrivateKey, originalFileName);
 
-                    case Models.EncryptionMethod.RSADirect:
-                        if (consumerPublicKey == null)
-                            throw new ArgumentNullException("Consumer public key is required for RSA Direct");
-                        encryptedData = EncryptRSADirect(package, consumerPublicKey.Value);
-                        break;
+                    // Encrypt based on method
+                    switch (method)
+                    {
+                        case Models.EncryptionMethod.SecureEnvelope:
+                            if (consumerPublicKey == null)
+                                throw new ArgumentNullException("Consumer public key is required for Secure Envelope");
+                            encryptedData = EncryptSecureEnvelope(package, consumerPublicKey.Value, recipientMode);
+                            break;
+
+                        case Models.EncryptionMethod.Symmetric:
+                            if (symmetricKey == null)
+                                throw new ArgumentNullException("Symmetric key is required");
+                            encryptedData = EncryptSymmetric(package, symmetricKey, symmetricMode);
+                            break;
+
+                        case Models.EncryptionMethod.RSADirect:
+                            if (consumerPublicKey == null)
+                                throw new ArgumentNullException("Consumer public key is required for RSA Direct");
+                            encryptedData = EncryptRSADirect(package, consumerPublicKey.Value, recipientMode, RSAEncryptionMode.WithSignature);
+                            break;
+                    }
                 }
 
                 // Save encrypted file

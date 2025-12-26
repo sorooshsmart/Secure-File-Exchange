@@ -70,10 +70,13 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </UserControl.Resources>
 
-    <Grid>
+    <!-- FIXED: Added ScrollViewer -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
         <StackPanel HorizontalAlignment="Center" 
                    VerticalAlignment="Center"
-                   Width="420">
+                   Width="420"
+                   Margin="0,20">
             
             <!-- Logo -->
             <Border Background="#1f6feb"
@@ -177,7 +180,7 @@
             <Border Background="#0d1117"
                     CornerRadius="6"
                     Padding="15"
-                    Margin="0,30,0,0"
+                    Margin="0,30,0,20"
                     BorderBrush="#30363d"
                     BorderThickness="1">
                 <StackPanel>
@@ -203,5 +206,5 @@
                 </StackPanel>
             </Border>
         </StackPanel>
-    </Grid>
+    </ScrollViewer>
 </UserControl>

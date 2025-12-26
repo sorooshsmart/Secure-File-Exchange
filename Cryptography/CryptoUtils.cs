@@ -64,6 +64,7 @@ namespace SecureFileExchange.Cryptography
             }
         }
 
+        //Uselees for now maybe later
         public static byte[] CombineBytes(params byte[][] arrays)
         {
             int totalLength = 0;

@@ -21,6 +21,7 @@ C:\Users\HP\source\repos\SecureFileExchange\SecureFileExchange\obj\Debug\net8.0-
 C:\Users\HP\source\repos\SecureFileExchange\SecureFileExchange\obj\Debug\net8.0-windows\SecureFileExchange.AssemblyInfoInputs.cache
 C:\Users\HP\source\repos\SecureFileExchange\SecureFileExchange\obj\Debug\net8.0-windows\SecureFileExchange.AssemblyInfo.cs
 C:\Users\HP\source\repos\SecureFileExchange\SecureFileExchange\obj\Debug\net8.0-windows\SecureFileExchange.csproj.CoreCompileInputs.cache
+C:\Users\HP\source\repos\SecureFileExchange\SecureFileExchange\obj\Debug\net8.0-windows\SecureFileExchange.sourcelink.json
 C:\Users\HP\source\repos\SecureFileExchange\SecureFileExchange\obj\Debug\net8.0-windows\SecureFileExchange.dll
 C:\Users\HP\source\repos\SecureFileExchange\SecureFileExchange\obj\Debug\net8.0-windows\refint\SecureFileExchange.dll
 C:\Users\HP\source\repos\SecureFileExchange\SecureFileExchange\obj\Debug\net8.0-windows\SecureFileExchange.pdb

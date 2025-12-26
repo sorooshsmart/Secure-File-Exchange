@@ -9,6 +9,10 @@
     </UserControl.DataContext>
 
     <UserControl.Resources>
+        <!-- Converters -->
+        <vm:SenderTypeConverter x:Key="SenderTypeConverter"/>
+        <vm:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+        
         <Style x:Key="SectionTitle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="#c9d1d9"/>
             <Setter Property="FontSize" Value="15"/>
@@ -132,36 +136,98 @@
                 </Grid>
             </Border>
 
-            <!-- Producer Public Key -->
-            <TextBlock Text="🔑 Select Producer User (Who encrypted this file)" Style="{StaticResource SectionTitle}"/>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                
-                <ComboBox Grid.Column="0"
-                         ItemsSource="{Binding AvailableUsers}"
-                         SelectedItem="{Binding SelectedProducerUsername}"
-                         Height="44"
-                         FontSize="14"
-                         Foreground="White"
-                         Margin="0,0,8,8">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding}" Foreground="White"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-                
-                <Button Grid.Column="1"
-                       Content="🔄"
-                       Command="{Binding RefreshUsersCommand}"
-                       Style="{StaticResource BrowseButton}"
-                       Width="44"
-                       Margin="0,0,0,8"
-                       ToolTip="Refresh user list"/>
-            </Grid>
+            <!-- Sender Type Selection -->
+            <TextBlock Text="👤 Sender Type" Style="{StaticResource SectionTitle}"/>
+            <Border Background="#0d1117"
+                    CornerRadius="6"
+                    Padding="12"
+                    BorderBrush="#30363d"
+                    BorderThickness="1"
+                    Margin="0,0,0,8">
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Content="Internal User (Same System)"
+                               IsChecked="{Binding SenderType, Converter={StaticResource SenderTypeConverter}, ConverterParameter=Internal}"
+                               Foreground="#c9d1d9"
+                               Margin="0,0,20,0"
+                               GroupName="SenderType"/>
+                    <RadioButton Content="External User (Different System)"
+                               IsChecked="{Binding SenderType, Converter={StaticResource SenderTypeConverter}, ConverterParameter=External}"
+                               Foreground="#58a6ff"
+                               GroupName="SenderType"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Internal Sender Selection -->
+            <Border Visibility="{Binding SenderType, Converter={StaticResource SenderTypeConverter}, ConverterParameter=Internal}">
+                <StackPanel>
+                    <TextBlock Text="🔑 Select Producer User (Who encrypted this file)" Style="{StaticResource SectionTitle}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <ComboBox Grid.Column="0"
+                                 ItemsSource="{Binding AvailableUsers}"
+                                 SelectedItem="{Binding SelectedProducerUsername}"
+                                 Height="44"
+                                 FontSize="14"
+                                 Margin="0,0,8,8">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" Foreground="#c9d1d9"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        
+                        <Button Grid.Column="1"
+                               Content="🔄"
+                               Command="{Binding RefreshUsersCommand}"
+                               Style="{StaticResource BrowseButton}"
+                               Width="44"
+                               Margin="0,0,0,8"
+                               ToolTip="Refresh user list"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- External Sender Public Key -->
+            <Border Visibility="{Binding SenderType, Converter={StaticResource SenderTypeConverter}, ConverterParameter=External}">
+                <StackPanel>
+                    <TextBlock Text="🔑 Sender's Public Keys" Style="{StaticResource SectionTitle}"/>
+                    <Border Background="#0d1117" 
+                           CornerRadius="6" 
+                           Padding="12"
+                           BorderBrush="#30363d"
+                           BorderThickness="1"
+                           Margin="0,0,0,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding ExternalSenderName}"
+                                          Foreground="#58a6ff"
+                                          FontSize="13"
+                                          FontWeight="SemiBold"
+                                          Visibility="{Binding ExternalSenderName, Converter={StaticResource StringToVisibilityConverter}}"/>
+                                <TextBlock Text="{Binding ExternalPublicKeyPath}"
+                                          Foreground="#7d8590"
+                                          FontSize="11"
+                                          TextTrimming="CharacterEllipsis"/>
+                            </StackPanel>
+                            
+                            <Button Grid.Column="1"
+                                   Content="Load Keys"
+                                   Command="{Binding BrowseExternalPublicKeyCommand}"
+                                   Style="{StaticResource BrowseButton}"
+                                   Margin="8,0,0,0"/>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Border>
 
             <!-- Key Input for Symmetric (Optional) -->
             <TextBlock Text="🔐 Symmetric Key (Optional - Only for Symmetric Method)" Style="{StaticResource SectionTitle}"/>
@@ -255,13 +321,8 @@
                     <TextBlock TextWrapping="Wrap"
                               Foreground="#7d8590"
                               FontSize="12"
-                              LineHeight="18">
-                        <Run Text="• For Secure Envelope and RSA Direct: Only producer's public key is needed"/>
-                        <LineBreak/>
-                        <Run Text="• For Symmetric: Provide the same password or key file used during encryption"/>
-                        <LineBreak/>
-                        <Run Text="• The system will automatically detect the encryption method from the file"/>
-                    </TextBlock>
+                              LineHeight="18"
+                              Text="For Secure Envelope and RSA Direct: Only sender public key is needed. For Symmetric: Provide the same password or key file used during encryption. The system will automatically detect the encryption method from the file. External mode: File was encrypted on a different system."/>
                 </StackPanel>
             </Border>
 

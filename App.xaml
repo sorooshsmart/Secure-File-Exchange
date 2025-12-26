@@ -12,5 +12,10 @@
         <converters:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter"/>
         <converters:MethodToVisibilityConverter x:Key="MethodToVisibilityConverter"/>
         <converters:ProgressToVisibilityConverter x:Key="ProgressToVisibilityConverter"/>
+
+        <!-- NEW Converters for External Public Key Support -->
+        <converters:RecipientTypeConverter x:Key="RecipientTypeConverter"/>
+        <converters:SenderTypeConverter x:Key="SenderTypeConverter"/>
+        <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
     </Application.Resources>
 </Application>

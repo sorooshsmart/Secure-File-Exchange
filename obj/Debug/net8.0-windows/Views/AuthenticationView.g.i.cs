@@ -61,7 +61,7 @@ namespace SecureFileExchange.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/SecureFileExchange;V1.0.0.0;component/views/authenticationview.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/SecureFileExchange;component/views/authenticationview.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\AuthenticationView.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);
